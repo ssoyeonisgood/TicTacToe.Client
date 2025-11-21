@@ -35,7 +35,7 @@ export default function GamePage({ game, setGame, roomCode }) {
       </div>
 
       <div className="bg-white p-6 rounded shadow">
-        <Board board={game.board} onCellClick={(i)=>makeMove(i)} />
+        <Board board={game.board} currentTurn={game.currentTurn} onCellClick={(i)=>makeMove(i)} />
         <div className="mt-4 text-center">
           {game.isFinished ? (
             <div className="text-xl font-semibold">

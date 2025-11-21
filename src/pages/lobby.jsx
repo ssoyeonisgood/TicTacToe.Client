@@ -7,24 +7,10 @@ export default function Lobby() {
 
   const create = async () => {
   if (!name) return alert("Enter your name");
-
   try {
-    const response = await fetch("http://localhost:5025/game/create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ playerName: name })
-    });
-
-    if (!response.ok) {
-      const text = await response.text();
-      console.error("Server response:", text);
-      throw new Error("Create failed");
-    }
-
-    const data = await response.json();
-    console.log("Game created:", data);
-  } catch (err) {
-    console.error(err);
+    await invoke("CreateGame", name);  // <-- 이거!!
+  } catch (e) {
+    console.error(e);
     alert("Create failed");
   }
 };

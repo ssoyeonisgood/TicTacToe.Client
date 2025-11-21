@@ -10,3 +10,8 @@
 .input { 
   padding: .5rem .75rem; border: 1px solid #e5e7eb; border-radius: .375rem; 
 }
+
+.cell.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

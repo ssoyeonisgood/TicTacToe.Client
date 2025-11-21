@@ -5,7 +5,7 @@ import { startConnection, on, getConnection, off } from "./services/signalRServi
 
 export default function App() {
   const [connected, setConnected] = useState(false);
-  const [game, setGame] = useState(null); // game state object from server
+  const [game, setGame] = useState(null); // game object from server
   const [roomCode, setRoomCode] = useState(null);
 
   useEffect(() => {
@@ -14,7 +14,8 @@ export default function App() {
       () => setConnected(false)
     )
     .then(conn => {
-      // Register handlers
+      //SignalR invoke("CreateGame") or invoke("JoinGame") will be called from Lobby page
+      //then get responses with g which is the game object
       conn.on("GameCreated", (g) => {
         setGame(g);
         setRoomCode(g.gameId);
@@ -32,7 +33,6 @@ export default function App() {
       console.error("SignalR start failed:", err);
     });
 
-    // cleanup
     return () => {
       const c = getConnection();
       if (c) {
