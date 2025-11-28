@@ -8,7 +8,6 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { Lobby } from "./pages/lobby";
-import { SingUp } from "./pages/singUp";
 
 function AppWrapper() {
   return (
@@ -37,9 +36,9 @@ function App() {
           setExistUser(isExist);
         });
         conn.on("UserSignedUp", (ok: boolean) => {
-          if (ok) {
-            navigate("/");
-          }
+          // if (ok) {
+          //   navigate("/");
+          // }
         });
         conn.on("GameCreated", (g) => {
           setGame(g);
@@ -93,7 +92,6 @@ function App() {
       <Routes>
         <Route path="/" element={<LogIn setUserName={setUserName} />} />
         <Route path="/lobby" element={<Lobby />} />
-        <Route path="/signup" element={<SingUp />} />
       </Routes>
     </div>
   );

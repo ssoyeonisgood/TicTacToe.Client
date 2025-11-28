@@ -1,1 +1,45 @@
+@import url("https://fonts.googleapis.com/css2?family=Balsamiq+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Honk&display=swap");
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --font-honk: "Honk", sans-serif;
+  --font-family: "Balsamiq Sans", sans-serif;
+}
+
+body {
+  font-family: var(--font-family);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float[style*="animationDelay"] {
+  animation-fill-mode: both;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
