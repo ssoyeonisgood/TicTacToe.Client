@@ -1,41 +1,65 @@
-import { useState, type FC } from "react";
-import { invoke } from "../services/signalRService";
+import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { ErrorAlert } from "@/components/errorAlert";
+import { invoke, getConnection } from "../services/signalRService";
 
-interface LogInProps {
-  setUserName: (name: string) => void;
-}
-
-export const LogIn: FC<LogInProps> = ({ setUserName }) => {
+export const LogIn = () => {
   const [name, setName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const conn = getConnection();
+    if (!conn) return;
+
+    conn.on("UserLogedIn", (isExist: boolean) => {
+      if (isExist) {
+        navigate("/lobby");
+      }
+    });
+
+    conn.on("UserSignedUp", () => {
+      setIsSignUp(false);
+      setSuccessMsg("Account created successfully! Please log in.");
+      setName("");
+    });
+
+    conn.on("Error", (msg) => {
+      console.log("Server: " + msg);
+      setIsError(true);
+    });
+
+    return () => {
+      conn.off("UserLogedIn");
+      conn.off("UserSignedUp");
+    };
+  }, [navigate]);
 
   const login = async () => {
-    if (!name) return alert("Enter your name.");
-    try {
-      await invoke("LoginGame", name);
-      setUserName(name);
-    } catch (e) {
-      console.error(e);
-      alert("Login failed");
+    if (!name) {
+      setErrorMsg("Please enter a username.");
+      setIsError(true);
+      return;
     }
+    await invoke("LoginGame", name);
   };
 
   const signup = async () => {
-    if (!name) return alert("Enter your name.");
-    try {
-      await invoke("SignUpGame", name);
-      setIsSignUp(false);
-      setName("");
-    } catch (e) {
-      console.error(e);
-      alert("Signup failed");
+    if (!name) {
+      setErrorMsg("Please enter a username.");
+      setIsError(true);
+      return;
     }
+    await invoke("SignUpGame", name);
   };
-
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-linear-to-br from-[#667eea] to-[#764ba2] relative overflow-hidden">
       <div
@@ -46,7 +70,7 @@ export const LogIn: FC<LogInProps> = ({ setUserName }) => {
       </div>
       <div
         className="absolute text-7xl font-bold text-black/30 animate-float"
-        style={{ top: "20%", right: "15%", animationDelay: "1s" }}
+        style={{ top: "10%", right: "15%", animationDelay: "1s" }}
       >
         O
       </div>
@@ -74,8 +98,8 @@ export const LogIn: FC<LogInProps> = ({ setUserName }) => {
       >
         O
       </div>
-      <div className="flex flex-row w-full items-center justify-center gap-20">
-        <div className="flex flex-col">
+      <div className="flex flex-row w-[70%] items-center justify-center gap-10">
+        <div className="flex flex-col w-[50%]">
           <h1 className="text-9xl font-honk animate-bounce text-center">
             Welcome to
             <br /> Socket-Tac-Toe
@@ -84,9 +108,8 @@ export const LogIn: FC<LogInProps> = ({ setUserName }) => {
             Play Tic-Tac-Toe in real-time with your friends! <br /> Create a
             room and share the room ID, or join a friend's room to compete live!
           </p>
-          <div className="bg-white rounded-2xl shadow-xl w-full h-100 z-10 flex items-center justify-center flex-col"></div>
         </div>
-        <div className="bg-white rounded-2xl shadow-xl w-1/4 h-200 z-10 flex items-center justify-center flex-col">
+        <div className="bg-white rounded-2xl shadow-xl w-[30%] h-150 z-10 flex items-center justify-center flex-col">
           <AnimatePresence mode="wait">
             {!isSignUp ? (
               <motion.div
@@ -100,20 +123,36 @@ export const LogIn: FC<LogInProps> = ({ setUserName }) => {
                 <h1 className="text-2xl font-bold text-gray-800 mb-6">
                   Login to your account
                 </h1>
-
                 <div className="flex flex-col gap-8 w-[60%]">
                   <div className="flex flex-col">
                     <Label className="text-gray-700 mb-2">Username</Label>
                     <Input
                       type="text"
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={(e) => {
+                        setName(e.target.value);
+                        setErrorMsg(null);
+                        setIsError(false);
+                        setSuccessMsg(null);
+                      }}
                       placeholder="Your username"
                       required
                       className="focus:outline-none focus:ring-2 focus:ring-blue-400 border-gray-300"
                     />
                   </div>
-
+                  {successMsg !== null && (
+                    <ErrorAlert message={successMsg} variant="default" />
+                  )}
+                  {isError && (
+                    <ErrorAlert
+                      message={
+                        errorMsg === null
+                          ? "Username does not exist. Please try again."
+                          : errorMsg
+                      }
+                      variant="destructive"
+                    />
+                  )}
                   <Button
                     onClick={login}
                     className="bg-blue-500 text-white font-semibold py-3 rounded-xl hover:bg-blue-600 transition cursor-pointer"
@@ -151,13 +190,26 @@ export const LogIn: FC<LogInProps> = ({ setUserName }) => {
                     <Input
                       type="text"
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={(e) => {
+                        setName(e.target.value);
+                        setErrorMsg(null);
+                        setIsError(false);
+                        setSuccessMsg(null);
+                      }}
                       placeholder="Choose username"
                       required
                       className="focus:outline-none focus:ring-2 focus:ring-blue-400 border-gray-300"
                     />
                   </div>
-
+                  {isError && (
+                    <ErrorAlert
+                      message={
+                        errorMsg === null
+                          ? "Username already exists. Try another."
+                          : errorMsg
+                      }
+                    />
+                  )}
                   <Button
                     className="bg-red-500 text-white font-semibold py-3 rounded-xl hover:bg-red-600 transition cursor-pointer"
                     onClick={signup}
