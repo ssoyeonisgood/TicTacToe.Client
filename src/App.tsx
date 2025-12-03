@@ -4,8 +4,14 @@ import { startConnection } from "./services/signalRService";
 import { LogIn } from "./pages/logIn";
 import { Lobby } from "./pages/lobby";
 
+export interface User {
+  name: string;
+  symbol: string | null;
+}
+
 export default function App() {
   const [connected, setConnected] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     startConnection(
@@ -27,8 +33,8 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LogIn />} />
-        <Route path="/lobby" element={<Lobby />} />
+        <Route path="/" element={<LogIn setUser={setUser} />} />
+        <Route path="/lobby" element={<Lobby user={user} />} />
       </Routes>
     </Router>
   );

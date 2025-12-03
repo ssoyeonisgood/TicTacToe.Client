@@ -1,67 +1,235 @@
 import { useState, type FC } from "react";
 import { invoke } from "../services/signalRService";
+import FloatSymbol from "@/components/ui/floatSymbol";
+import GeoShape from "@/components/ui/geoShape";
 
 interface LobbyProps {
-  userName?: string;
+  user: { name: string; symbol: string | null };
 }
 
-export const Lobby: FC<LobbyProps> = () => {
+export const Lobby: FC<LobbyProps> = ({ user }) => {
   const [name, setName] = useState("");
   const [joinCode, setJoinCode] = useState("");
 
-  const create = async () => {
-    if (!name) return alert("Enter your name");
-    try {
-      await invoke("CreateGame", name);
-    } catch (e) {
-      console.error(e);
-      alert("Create failed");
-    }
-  };
+  // const create = async () => {
+  //   if (!name) return alert("Enter your name");
+  //   try {
+  //     await invoke("CreateGame", name);
+  //   } catch (e) {
+  //     console.error(e);
+  //     alert("Create failed");
+  //   }
+  // };
 
-  const join = async () => {
-    if (!joinCode || !name) return alert("Enter name & room code");
-    try {
-      await invoke("JoinGame", joinCode, name);
-    } catch (e) {
-      console.error(e);
-      alert("Join failed");
-    }
-  };
+  // const join = async () => {
+  //   if (!joinCode || !name) return alert("Enter name & room code");
+  //   try {
+  //     await invoke("JoinGame", joinCode, name);
+  //   } catch (e) {
+  //     console.error(e);
+  //     alert("Join failed");
+  //   }
+  // };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
-      <div className="w-full max-w-md bg-white p-6 rounded shadow">
-        <h1 className="text-2xl font-semibold mb-4">Tic Tac Toe</h1>
-        <input
-          className="input mb-3 w-full"
-          placeholder="Your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <button
-          onClick={create}
-          className="w-full py-2 bg-blue-600 text-white rounded mb-3 hover:bg-blue-700"
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-linear-to-br from-[#667eea] to-[#764ba2]">
+      <FloatSymbol
+        simbol="🏆"
+        top="10%"
+        left="8%"
+        size="text-8xl"
+        animationDelay="0s"
+      />
+      <FloatSymbol
+        simbol="🎮"
+        top="15%"
+        right="12%"
+        size="text-8xl"
+        animationDelay="0.5s"
+      />
+      <FloatSymbol
+        simbol="⭐"
+        top="70%"
+        left="10%"
+        size="text-7xl"
+        animationDelay="1s"
+      />
+      <FloatSymbol
+        simbol="🔥"
+        bottom="20%"
+        right="15%"
+        size="text-8xl"
+        animationDelay="1.5s"
+      />
+      <FloatSymbol
+        simbol="👑"
+        top="50%"
+        left="5%"
+        size="text-7xl"
+        animationDelay="2s"
+      />
+      <FloatSymbol
+        simbol="🚀"
+        bottom="30%"
+        right="8%"
+        size="text-7xl"
+        animationDelay="0.8s"
+      />
+      <FloatSymbol
+        simbol="🥇"
+        top="35%"
+        right="5%"
+        size="text-7xl"
+        animationDelay="1.2s"
+      />
+      <FloatSymbol
+        simbol="🎲"
+        bottom="15%"
+        left="15%"
+        size="text-7xl"
+        animationDelay="1.8s"
+      />
+      <FloatSymbol
+        simbol="🎯"
+        top="80%"
+        right="20%"
+        size="text-7xl"
+        animationDelay="0.3s"
+      />
+      <FloatSymbol
+        simbol="⚡"
+        top="25%"
+        left="12%"
+        size="text-7xl"
+        animationDelay="2.3s"
+      />
+      <FloatSymbol
+        simbol="✨"
+        bottom="40%"
+        left="8%"
+        size="text-7xl"
+        animationDelay="1.6s"
+      />
+      <FloatSymbol
+        simbol="💎"
+        top="60%"
+        right="10%"
+        size="text-7xl"
+        animationDelay="0.9s"
+      />
+
+      <GeoShape
+        type="circle"
+        top="5%"
+        right="30%"
+        size={120}
+        animationDelay="0.4s"
+      />
+      <GeoShape
+        type="square"
+        bottom="10%"
+        left="25%"
+        size={100}
+        animationDelay="1.1s"
+      />
+      <GeoShape
+        type="triangle"
+        top="40%"
+        right="25%"
+        size={100}
+        animationDelay="1.9s"
+      />
+      <GeoShape
+        type="circle"
+        bottom="50%"
+        left="18%"
+        size={120}
+        animationDelay="0.7s"
+      />
+      <GeoShape
+        type="circle"
+        bottom="5%"
+        left="30%"
+        size={120}
+        animationDelay="0.4s"
+      />
+      <GeoShape
+        type="square"
+        top="10%"
+        right="25%"
+        size={100}
+        animationDelay="1.1s"
+      />
+      <GeoShape
+        type="triangle"
+        bottom="40%"
+        left="25%"
+        size={100}
+        animationDelay="1.9s"
+      />
+      <GeoShape
+        type="circle"
+        top="50%"
+        right="18%"
+        size={120}
+        animationDelay="0.7s"
+      />
+      <header className="text-center text-white mb-12 relative z-10">
+        <h1 className="text-6xl font-semibold">
+          <span>Welcome back</span>,{" "}
+          <span className="opacity-90 font-normal">{user.name}</span>!
+        </h1>
+      </header>
+      <div
+        className="
+          flex gap-6 flex-wrap justify-center
+          max-w-3xl w-full relative z-10
+        "
+      >
+        <div
+          className="
+            bg-white p-10 rounded-2xl flex-1 min-w-[280px] max-w-[360px]
+            text-center cursor-pointer transition-all duration-300
+            shadow-xl hover:-translate-y-2 hover:shadow-2xl
+          "
         >
-          Create Game
-        </button>
-        <div className="flex items-center gap-2">
-          <input
-            className="input flex-1"
-            placeholder="Room Code"
-            value={joinCode}
-            onChange={(e) => setJoinCode(e.target.value)}
-          />
-          <button
-            onClick={join}
-            className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          <div
+            className="
+              w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center
+              text-4xl font-bold
+              bg-linear-to-br from-indigo-400 to-purple-600 text-white
+            "
           >
-            Join
-          </button>
+            +
+          </div>
+          <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+            Create Game
+          </h3>
+          <p className="text-gray-600 text-sm">
+            Start a new game and invite others
+          </p>
         </div>
-        <p className="text-sm text-gray-500 mt-4">
-          Create a room and share the code with a friend.
-        </p>
+        <div
+          className="
+            bg-white p-10 rounded-2xl flex-1 min-w-[280px] max-w-[360px]
+            text-center cursor-pointer transition-all duration-300
+            shadow-xl hover:-translate-y-2 hover:shadow-2xl
+          "
+        >
+          <div
+            className="
+              w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center
+              text-4xl font-bold
+              bg-linear-to-br from-pink-300 to-rose-500 text-white
+            "
+          >
+            →
+          </div>
+          <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+            Join Game
+          </h3>
+          <p className="text-gray-600 text-sm">Enter an existing game room</p>
+        </div>
       </div>
     </div>
   );

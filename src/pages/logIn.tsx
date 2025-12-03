@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type FC } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -6,8 +6,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ErrorAlert } from "@/components/errorAlert";
 import { invoke, getConnection } from "../services/signalRService";
+import FloatSymbol from "@/components/ui/floatSymbol";
 
-export const LogIn = () => {
+interface LogInProps {
+  setUser: (user: { name: string; symbol: string | null }) => void;
+}
+
+export const LogIn: FC<LogInProps> = ({ setUser }) => {
   const [name, setName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -20,9 +25,10 @@ export const LogIn = () => {
     const conn = getConnection();
     if (!conn) return;
 
-    conn.on("UserLogedIn", (isExist: boolean) => {
-      if (isExist) {
+    conn.on("UserLoggedIn", (user) => {
+      if (user.name === name) {
         navigate("/lobby");
+        setUser(user);
       }
     });
 
@@ -41,7 +47,7 @@ export const LogIn = () => {
       conn.off("UserLogedIn");
       conn.off("UserSignedUp");
     };
-  }, [navigate]);
+  }, [navigate, name, setUser]);
 
   const login = async () => {
     if (!name) {
@@ -60,44 +66,45 @@ export const LogIn = () => {
     }
     await invoke("SignUpGame", name);
   };
+
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-linear-to-br from-[#667eea] to-[#764ba2] relative overflow-hidden">
-      <div
-        className="absolute text-7xl font-bold text-black/30 animate-float"
-        style={{ top: "10%", left: "10%" }}
-      >
-        X
-      </div>
-      <div
-        className="absolute text-7xl font-bold text-black/30 animate-float"
-        style={{ top: "10%", right: "15%", animationDelay: "1s" }}
-      >
-        O
-      </div>
-      <div
-        className="absolute text-8xl font-bold text-black/30 animate-float"
-        style={{ bottom: "5%", left: "10%", animationDelay: "2s" }}
-      >
-        X
-      </div>
-      <div
-        className="absolute text-8xl font-bold text-black/30 animate-float"
-        style={{ bottom: "25%", right: "10%", animationDelay: "1.5s" }}
-      >
-        O
-      </div>
-      <div
-        className="absolute text-6xl font-bold text-black/30 animate-float"
-        style={{ top: "60%", left: "5%", animationDelay: "0.5s" }}
-      >
-        X
-      </div>
-      <div
-        className="absolute text-6xl font-bold text-black/30 animate-float"
-        style={{ top: "40%", right: "5%", animationDelay: "2.5s" }}
-      >
-        O
-      </div>
+    <div className="min-h-screen w-full flex items-center justify-center bg-linear-to-br from-[#667eea] to-[#764ba2]">
+      <FloatSymbol top="10%" left="10%" size="text-7xl" simbol="X" />
+      <FloatSymbol
+        top="10%"
+        right="15%"
+        animationDelay="1s"
+        size="text-7xl"
+        simbol="O"
+      />
+      <FloatSymbol
+        bottom="10%"
+        left="10%"
+        animationDelay="2s"
+        size="text-8xl"
+        simbol="X"
+      />
+      <FloatSymbol
+        bottom="25%"
+        right="10%"
+        animationDelay="1.5s"
+        simbol="O"
+        size="text-8xl"
+      />
+      <FloatSymbol
+        top="60%"
+        left="5%"
+        animationDelay="0.5s"
+        size="text-6xl"
+        simbol="X"
+      />
+      <FloatSymbol
+        top="40%"
+        right="5%"
+        size="text-6xl"
+        simbol="O"
+        animationDelay="2.5s"
+      />
       <div className="flex flex-row w-[70%] items-center justify-center gap-10">
         <div className="flex flex-col w-[50%]">
           <h1 className="text-9xl font-honk animate-bounce text-center">
@@ -165,7 +172,12 @@ export const LogIn = () => {
                   Don't have an account?{" "}
                   <span
                     className="text-blue-500 font-semibold cursor-pointer hover:underline"
-                    onClick={() => setIsSignUp(true)}
+                    onClick={() => {
+                      setIsSignUp(true);
+                      setIsError(false);
+                      setErrorMsg(null);
+                      setSuccessMsg(null);
+                    }}
                   >
                     Sign up
                   </span>
@@ -208,6 +220,7 @@ export const LogIn = () => {
                           ? "Username already exists. Try another."
                           : errorMsg
                       }
+                      variant="destructive"
                     />
                   )}
                   <Button
@@ -222,7 +235,12 @@ export const LogIn = () => {
                   Already have an account?{" "}
                   <span
                     className="text-red-500 font-semibold cursor-pointer hover:underline"
-                    onClick={() => setIsSignUp(false)}
+                    onClick={() => {
+                      setIsSignUp(false);
+                      setIsError(false);
+                      setErrorMsg(null);
+                      setSuccessMsg(null);
+                    }}
                   >
                     Log in
                   </span>
