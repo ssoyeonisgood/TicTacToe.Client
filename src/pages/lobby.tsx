@@ -1,35 +1,69 @@
-import { useState, type FC } from "react";
-import { invoke } from "../services/signalRService";
+import { useEffect, type FC } from "react";
+import { useNavigate } from "react-router-dom";
+import { invoke, getConnection, off } from "../services/signalRService";
 import FloatSymbol from "@/components/ui/floatSymbol";
 import GeoShape from "@/components/ui/geoShape";
+import type { Game, User } from "@/App";
 
 interface LobbyProps {
-  user: { name: string; symbol: string | null };
+  user: User | null;
+  setGame: (game: Game) => void;
+  setJoinCode: (code: string | null) => void;
+  joinCode: string | null;
 }
 
-export const Lobby: FC<LobbyProps> = ({ user }) => {
-  const [name, setName] = useState("");
-  const [joinCode, setJoinCode] = useState("");
+export const Lobby: FC<LobbyProps> = ({
+  user,
+  setGame,
+  setJoinCode,
+  joinCode,
+}) => {
+  const navigate = useNavigate();
 
-  // const create = async () => {
-  //   if (!name) return alert("Enter your name");
-  //   try {
-  //     await invoke("CreateGame", name);
-  //   } catch (e) {
-  //     console.error(e);
-  //     alert("Create failed");
-  //   }
-  // };
+  useEffect(() => {
+    const conn = getConnection();
+    if (!conn) return;
 
-  // const join = async () => {
-  //   if (!joinCode || !name) return alert("Enter name & room code");
-  //   try {
-  //     await invoke("JoinGame", joinCode, name);
-  //   } catch (e) {
-  //     console.error(e);
-  //     alert("Join failed");
-  //   }
-  // };
+    conn.on("GameCreated", (g) => {
+      if (g === null) return;
+      setGame(g);
+      setJoinCode(g.gameId);
+      navigate("/gamePage");
+    });
+    conn.on("GameJoined", (g) => {
+      if (g === null) return;
+      setGame(g);
+      setJoinCode(g.gameId);
+    });
+
+    conn.on("Error", (msg) => {
+      console.log("Server: " + msg);
+    });
+
+    return () => {
+      off("GameCreated");
+      off("GameJoined");
+    };
+  }, [navigate, setGame, setJoinCode]);
+
+  const create = async () => {
+    if (!user) return;
+    try {
+      await invoke("CreateGame", user.name);
+    } catch (e) {
+      console.error(e);
+      console.log("Creating a game failed");
+    }
+  };
+
+  const join = async () => {
+    try {
+      await invoke("JoinGame", joinCode, name);
+    } catch (e) {
+      console.error(e);
+      console.log("Join failed");
+    }
+  };
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-linear-to-br from-[#667eea] to-[#764ba2]">
@@ -176,8 +210,7 @@ export const Lobby: FC<LobbyProps> = ({ user }) => {
       />
       <header className="text-center text-white mb-12 relative z-10">
         <h1 className="text-6xl font-semibold">
-          <span>Welcome back</span>,{" "}
-          <span className="opacity-90 font-normal">{user.name}</span>!
+          Hey "{user?.name}", ready to play?
         </h1>
       </header>
       <div
@@ -192,6 +225,7 @@ export const Lobby: FC<LobbyProps> = ({ user }) => {
             text-center cursor-pointer transition-all duration-300
             shadow-xl hover:-translate-y-2 hover:shadow-2xl
           "
+          onClick={create}
         >
           <div
             className="
@@ -215,6 +249,7 @@ export const Lobby: FC<LobbyProps> = ({ user }) => {
             text-center cursor-pointer transition-all duration-300
             shadow-xl hover:-translate-y-2 hover:shadow-2xl
           "
+          onClick={join}
         >
           <div
             className="

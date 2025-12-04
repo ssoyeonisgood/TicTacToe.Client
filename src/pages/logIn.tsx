@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ErrorAlert } from "@/components/errorAlert";
-import { invoke, getConnection } from "../services/signalRService";
+import { invoke, getConnection, off } from "../services/signalRService";
 import FloatSymbol from "@/components/ui/floatSymbol";
+import type { User } from "@/App";
 
 interface LogInProps {
-  setUser: (user: { name: string; symbol: string | null }) => void;
+  setUser: (user: User | null) => void;
 }
 
 export const LogIn: FC<LogInProps> = ({ setUser }) => {
@@ -44,8 +45,8 @@ export const LogIn: FC<LogInProps> = ({ setUser }) => {
     });
 
     return () => {
-      conn.off("UserLogedIn");
-      conn.off("UserSignedUp");
+      off("UserLogedIn");
+      off("UserSignedUp");
     };
   }, [navigate, name, setUser]);
 
