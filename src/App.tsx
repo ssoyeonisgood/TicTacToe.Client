@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { startConnection } from "./services/signalRService";
+import { startConnection, getConnection } from "./services/signalRService";
 import { LogIn } from "./pages/logIn";
 import { Lobby } from "./pages/lobby";
 import { GamePage } from "./pages/gamePage";
+import { JoinGame } from "./pages/joinGame";
 
 export interface User {
   name: string;
@@ -33,6 +34,14 @@ export default function App() {
     ).catch((err) => {
       console.error("SignalR connection failed:", err);
     });
+
+    const conn = getConnection();
+    if (!conn) return;
+
+    conn.on("GameUpdated", (g) => {
+      if (g === null) return;
+      setGame(g);
+    });
   }, []);
 
   if (!connected) {
@@ -50,17 +59,16 @@ export default function App() {
         <Route
           path="/lobby"
           element={
-            <Lobby
-              user={user}
-              setGame={setGame}
-              setJoinCode={setJoinCode}
-              joinCode={joinCode}
-            />
+            <Lobby user={user} setGame={setGame} setJoinCode={setJoinCode} />
           }
         />
         <Route
           path="/gamePage"
           element={<GamePage game={game} joinCode={joinCode} />}
+        />
+        <Route
+          path="/joinGame"
+          element={<JoinGame user={user} setGame={setGame} />}
         />
       </Routes>
     </Router>

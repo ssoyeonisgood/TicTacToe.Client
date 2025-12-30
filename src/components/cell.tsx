@@ -19,7 +19,7 @@ const Cell: FC<CellProps> = ({ value, currentTurn }) => {
   return (
     <button
       onClick={handleClick}
-      className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center bg-slate-50 border rounded shadow-sm hover:scale-105 transition-transform"
+      className="w-full h-full bg-white rounded-2xl text-[48px] font-bold cursor-pointer transition-all duration-200 ease-in-out shadow-md border-none hover:scale-105 hover:shadow-lg flex items-center justify-center"
     >
       <span
         className={`text-4xl font-bold ${

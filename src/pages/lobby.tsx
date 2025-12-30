@@ -9,15 +9,9 @@ interface LobbyProps {
   user: User | null;
   setGame: (game: Game) => void;
   setJoinCode: (code: string | null) => void;
-  joinCode: string | null;
 }
 
-export const Lobby: FC<LobbyProps> = ({
-  user,
-  setGame,
-  setJoinCode,
-  joinCode,
-}) => {
+export const Lobby: FC<LobbyProps> = ({ user, setGame, setJoinCode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,11 +24,6 @@ export const Lobby: FC<LobbyProps> = ({
       setJoinCode(g.gameId);
       navigate("/gamePage");
     });
-    conn.on("GameJoined", (g) => {
-      if (g === null) return;
-      setGame(g);
-      setJoinCode(g.gameId);
-    });
 
     conn.on("Error", (msg) => {
       console.log("Server: " + msg);
@@ -42,7 +31,6 @@ export const Lobby: FC<LobbyProps> = ({
 
     return () => {
       off("GameCreated");
-      off("GameJoined");
     };
   }, [navigate, setGame, setJoinCode]);
 
@@ -57,12 +45,7 @@ export const Lobby: FC<LobbyProps> = ({
   };
 
   const join = async () => {
-    try {
-      await invoke("JoinGame", joinCode, name);
-    } catch (e) {
-      console.error(e);
-      console.log("Join failed");
-    }
+    navigate("/joinGame");
   };
 
   return (

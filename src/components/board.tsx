@@ -13,7 +13,7 @@ const Board: FC<BoardProps> = ({
   currentTurn,
 }) => {
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid grid-cols-3 gap-2 min-h-3/4 w-2/3">
       {board.flat().map((cell, idx) => (
         <Cell key={idx} value={cell} currentTurn={currentTurn} />
       ))}
